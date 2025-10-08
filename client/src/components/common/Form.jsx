@@ -1,22 +1,31 @@
-import { Select, SelectTrigger, SelectValue } from "@radix-ui/react-select";
+import { Select, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select";
+import { SelectContent } from "@radix-ui/react-select";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
 
 function CommonForm({ formFields, formData, setFormData, onSubmit, buttonText }) {
 
     function renderInputField(field) {
         let element = null;
+        const value = formData[field.name] || '';
+
+
         switch (field.type) {
             case 'input':
-                element = <input
+                element = <Input
                     type={field.type}
                     name={field.name}
                     placeholder={field.placeholder}
                     id={field.id}
+                    value={value}
                 />;
                 break;
 
             case 'select':
                 element = (
-                    <Select>
+                    <Select value={value} onValueChange={(val) => setFormData({ ...formData, [field.name]: val })}>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder={field.placeholder} />
                         </SelectTrigger>
@@ -33,20 +42,24 @@ function CommonForm({ formFields, formData, setFormData, onSubmit, buttonText })
 
             case 'textarea':
                 element = (
-                    <textarea
+                    <Textarea
                         placeholder={field.placeholder}
                         name={field.name}
                         id={field.id}
+                        value={value}
+                        onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                     />
                 );
                 break;
 
             default:
-                element = <input
+                element = <Input
                     type={field.type}
                     name={field.name}
                     placeholder={field.placeholder}
                     id={field.id}
+                    value={value}
+                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                 />;
                 break;
         }
@@ -54,7 +67,7 @@ function CommonForm({ formFields, formData, setFormData, onSubmit, buttonText })
         return element;
     }
     return (
-        <form>
+        <form onSubmit={onSubmit}>
             <div className="flex flex-col gap-3">
                 {
                     formFields.map(field => <div key={field.id} className="grid w-full gap-1.5">
@@ -65,6 +78,7 @@ function CommonForm({ formFields, formData, setFormData, onSubmit, buttonText })
                     </div>)
                 }
             </div>
+            <Button type="submit" className="mt-2 w-full">{buttonText || 'Submit'}</Button>
         </form>
     )
 }
