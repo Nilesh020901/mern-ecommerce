@@ -21,7 +21,7 @@ const registerUser = async (req, res) => {
 };
 
 //login user
-const login = async (req, res) => {
+const loginUser = async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });
@@ -32,7 +32,7 @@ const login = async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ success: false, message: "Incorrect password" });
         }
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.cookie('token', token, { httpOnly: true, secure: false }).json({ 
             success: true,
             message: "User logged in successfully",
@@ -49,17 +49,33 @@ const login = async (req, res) => {
 };
 
 //logout user
-const logout = async (req, res) => {
+const logoutUser = async (req, res) => {
     try {
-        // Clear the user's session or token
-        res.status(200).json({ message: "User logged out successfully" });
+        res.clearCookie('token').json({ success: true, message: "User logged out successfully" });
     } catch (error) {
         console.error("Error during user logout:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json({ success: false, message: "Server error" });
     }
 };
 
+const authMiddleware = (req, res, next) => {
+    const token = req.cookies.token;
+    if (!token) {
+        return res.status(401).json({ success: false, message: "No token, authorization denied" });
+    }
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        console.error("Error in auth middleware:", error);
+        res.status(500).json({ success: false, message: "Unauthorized access denied!" });
+    }
+}
+
 module.exports = {
     registerUser,
-    login,
+    loginUser,
+    logoutUser,
+    authMiddleware,
 };
