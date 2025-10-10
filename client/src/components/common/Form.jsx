@@ -1,9 +1,8 @@
-import { Select, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select";
-import { SelectContent } from "@radix-ui/react-select";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 function CommonForm({ formFields, formData, setFormData, onSubmit, buttonText }) {
 
@@ -12,7 +11,7 @@ function CommonForm({ formFields, formData, setFormData, onSubmit, buttonText })
         const value = formData[field.name] || '';
 
 
-        switch (field.type) {
+        switch (field.componentType) {
             case 'input':
                 element = <Input
                     type={field.type}
@@ -27,12 +26,12 @@ function CommonForm({ formFields, formData, setFormData, onSubmit, buttonText })
                 element = (
                     <Select value={value} onValueChange={(val) => setFormData({ ...formData, [field.name]: val })}>
                         <SelectTrigger className="w-full">
-                            <SelectValue placeholder={field.placeholder} />
+                            <SelectValue placeholder={field.label} />
                         </SelectTrigger>
                         <SelectContent>
                             {
                                 field.options && field?.options.length > 0 ?
-                                    field.options.map(option => <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>)
+                                    field.options.map((option) => (<SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>))
                                     : null
                             }
                         </SelectContent>
@@ -71,7 +70,7 @@ function CommonForm({ formFields, formData, setFormData, onSubmit, buttonText })
             <div className="flex flex-col gap-3">
                 {
                     formFields.map(field => <div key={field.id} className="grid w-full gap-1.5">
-                        <label htmlFor={field.name} className="mb-1">{field.label}</label>
+                        <Label htmlFor={field.name} className="mb-1">{field.label}</Label>
                         {
                             renderInputField(field)
                         }
