@@ -31,7 +31,7 @@ function MenuItems({setOpen}) {
     return <nav className="mt-10 flex flex-1 flex-col gap-2">
         {
             adminSidebarMenuItems.map((menuItem) => (
-                <div key={menuItem.id} onClick={() => { navigate(menuItem.path); setOpen(false); }} className="flex cursor-pointer items-center gap-2 rounded-md px-4 py-2 text-medium text-muted-foreground font-medium hover:bg-accent hover:text-accent-foreground">
+                <div key={menuItem.id} onClick={() => { navigate(menuItem.path); setOpen ? setOpen(false) : null; }} className="flex cursor-pointer items-center gap-2 rounded-md px-4 py-2 text-medium text-muted-foreground font-medium hover:bg-accent hover:text-accent-foreground">
                     {menuItem.icon}
                     <span>{menuItem.label}</span>
                 </div>)

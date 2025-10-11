@@ -19,6 +19,7 @@ function CommonForm({ formFields, formData, setFormData, onSubmit, buttonText })
                     placeholder={field.placeholder}
                     id={field.id}
                     value={value}
+                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                 />;
                 break;
 
