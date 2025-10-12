@@ -4,6 +4,7 @@ import { Label } from "../ui/label";
 import { FileImageIcon, TrashIcon, UploadCloudIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import axios from "axios";
+import { Skeleton } from "../ui/skeleton";
 
 function ProductImageUpload({ imageFile, setImageFile, uploadedImageUrl, setUploadedImageUrl, imageLoading, setImageLoading }) {
 
@@ -67,12 +68,15 @@ function ProductImageUpload({ imageFile, setImageFile, uploadedImageUrl, setUplo
             <div onDragOver={handleDragOver} onDrop={handleDrop} className="border-2 border-dashed rounded-lg p-4 mt-3">
                 <Input id="image-upload" type="file" accept="image/*" className="hidden" ref={inputRef} onChange={handleImageFileChange} />
                 {
-                    !imageFile ? 
-                        <Label htmlFor="image-upload" className="mt-2 flex flex-col items-center h-32 cursor-pointer justify-center text-sm">
+                    !imageFile ?
+                        (<Label htmlFor="image-upload" className="mt-2 flex flex-col items-center h-32 cursor-pointer justify-center text-sm">
                             <UploadCloudIcon className="mb-2 h-6 w-6 text-muted-foreground" />
                             <span>Drag & Drop or Click to upload image</span>
-                        </Label>
-                        : <div className="mt-2 flex items-center">
+                        </Label>)
+                        : (
+                        imageLoading ? 
+                        <Skeleton className='relative h-48 w-full rounded-xl overflow-hidden bg-gray-200 animate-pulse' /> :
+                        <div className="mt-2 flex items-center">
                             <div className="flex items-center justify-between w-full">
                                 <FileImageIcon className="mr-2 h-6 w-6 text-primary" />
                                 <span className="text-sm font-normal">{imageFile.name}</span>
@@ -80,7 +84,7 @@ function ProductImageUpload({ imageFile, setImageFile, uploadedImageUrl, setUplo
                                     <TrashIcon className="h-6 w-6" />
                                 </Button>
                             </div>
-                        </div>
+                        </div>)
                 }
             </div>
         </div>

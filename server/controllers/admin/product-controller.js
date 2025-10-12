@@ -23,8 +23,8 @@ const handleImageUpload = async (req, res) => {
 const addProduct = async (req, res) => {
 
     try {
-        const { title, description, price, category, brand, stock, imageUrl } = req.body;
-        if (!title || !description || !price || !category || !brand || !stock || !imageUrl) {
+        const { title, description, price, category, brand, totalStock, image } = req.body;
+        if (!title || !description || !price || !category || !brand || !totalStock || !image) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
         const newProduct = new Product({
@@ -33,8 +33,8 @@ const addProduct = async (req, res) => {
             price,
             category,
             brand,
-            stock,
-            imageUrl
+            totalStock,
+            image
         })
         await newProduct.save();
         res.status(201).json({ success: true, message: "Product added successfully", product: newProduct });
@@ -63,7 +63,7 @@ const editProduct = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const { title, description, price, category, brand, stock, imageUrl } = req.body;
+        const { title, description, price, category, brand, totalStock, image } = req.body;
 
         const product = await Product.findById(id);
         if (!product) {

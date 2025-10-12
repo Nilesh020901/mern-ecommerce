@@ -3,7 +3,10 @@ import CommonForm from "@/components/common/Form";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { addProductFormElements } from "@/config";
-import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { addNewProduct, fetchAllProducts } from "@/store/admin/products-slice";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const initialFormData = {
     image: null,
@@ -23,10 +26,33 @@ function AdminProducts() {
     const [imageFile, setImageFile] = useState(null);
     const [uploadedImageUrl, setUploadedImageUrl] = useState('');
     const [imageLoading, setImageLoading] = useState(false);
+    const {productList} = useSelector(state => state.adminProducts);
+    const dispatch = useDispatch();
+    const {toast} = useToast();
 
-    function onSubmit() {
-        console.log(formData);
+    function onSubmit(e) {
+        e.preventDefault();
+        dispatch(addNewProduct({
+            ...formData,
+            image: uploadedImageUrl
+        })).then((data) => {
+            if (data?.payload?.success) {
+                dispatch(fetchAllProducts());
+                setImageFile(null);
+                setFormData(initialFormData);
+                setOpenCreateProduct(false);
+                toast({
+                    title: 'Product add successfully'
+                })
+            }
+        })
     }
+
+    useEffect(() => {
+       dispatch(fetchAllProducts()) 
+    }, [dispatch])
+
+    console.log("call-productList", uploadedImageUrl, productList);
     return (
         <>
             <div className="mb-5 flex justify-end w-full">

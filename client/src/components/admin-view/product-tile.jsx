@@ -1,0 +1,5 @@
+function AdminProductTile({product}) {
+    return (
+        
+    )
+}

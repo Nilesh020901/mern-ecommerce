@@ -4,9 +4,9 @@ const productSchema = new mongoose.Schema({
     image: String,
     title: String,
     description: String,
-    price: Number,
     category: String,
     brand: String,
+    price: Number,
     salePrice: Number,
     totalStock: Number,
 }, { timestamps: true });
