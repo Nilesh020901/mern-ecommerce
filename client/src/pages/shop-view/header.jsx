@@ -1,11 +1,13 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { shoppingViewHeaderMenuItems } from "@/config"
-import { HousePlug, Menu, ShoppingCart } from "lucide-react"
-import { useSelector } from "react-redux"
-import { Link } from "react-router-dom"
+import { useToast } from "@/hooks/use-toast"
+import { logoutUser } from "@/store/auth-slice"
+import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react"
+import { useDispatch, useSelector } from "react-redux"
+import { Link, useNavigate } from "react-router-dom"
 
 function MenuItems() {
     return <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
@@ -16,6 +18,18 @@ function MenuItems() {
 }
 
 function HeaderRightContent() {
+    const { user } = useSelector(state => state.auth);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const {toast} = useToast();
+
+    function handleLogout(){
+        dispatch(logoutUser());
+        navigate('/verify/signin');
+        toast({
+            title: 'Please Visit Again!',
+        })
+    }
     return (
         <div className="flex lg:items-center lg:flex-row flex-col gap-4">
             <Button variant="outline" size="icon">
@@ -25,15 +39,23 @@ function HeaderRightContent() {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Avatar className="bg-black flex items-center justify-center">
-                        <AvatarFallback className="bg-black text-white font-bold">
-                            NS
+                        <AvatarFallback className="bg-black text-white font-bold cursor-pointer">
+                            {user?.username ? user.username.charAt(0).toUpperCase() : 'Guest' }
                         </AvatarFallback>
                     </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="right" className="w-56">
                     <DropdownMenuLabel>
-                        Logged in as
+                        Logged in as {user?.username ? user?.username : 'Guest' }
                     </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate('/shop/profile')}>
+                        <UserCog className="w-4 h-4 mr-2" /> <span className="text-sm font-medium">Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="w-4 h-4 mr-2" /> <span className="text-sm font-medium">Logout</span>
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
@@ -42,8 +64,7 @@ function HeaderRightContent() {
 
 function ShoppingHeader() {
 
-    const { isAuthenticated, user } = useSelector(state => state.auth)
-    console.log("call-user", user);
+    const { isAuthenticated } = useSelector(state => state.auth)
     return (
         <header className="sticky top-0 z-40 w-full border-b bg-background">
             <div className="flex items-center justify-between h-16 px-4 md:px-6">
@@ -58,18 +79,17 @@ function ShoppingHeader() {
                             <span className="sr-only">Toggle header menu</span>
                         </Button>
                     </SheetTrigger>
-                    <SheetContent side="left" className="w-full max-w-xs">
+                    <SheetContent side="left" className="w-full max-w-xs flex flex-col justify-between">
                         <MenuItems />
+                        <HeaderRightContent />
                     </SheetContent>
                 </Sheet>
                 <div className="hidden lg:block">
                     <MenuItems />
                 </div>
-                {
-                    isAuthenticated ? <div>
-                        <HeaderRightContent />
-                    </div> : null
-                }
+                <div className="hidden lg:block">
+                    <HeaderRightContent />
+                </div> 
             </div>
         </header>
     )
