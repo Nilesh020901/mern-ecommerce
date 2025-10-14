@@ -19,13 +19,27 @@ export const registerUser = createAsyncThunk(
             return rejectWithValue(error.response.data);
         }
     }
-)
+);
 
 export const loginUser = createAsyncThunk(
     'verify/signin',
     async (formData, { rejectWithValue }) => {
         try {
             const response = await axios.post('http://localhost:5000/api/auth/login', formData, {
+                withCredentials: true
+            });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const logoutUser = createAsyncThunk(
+    'verify/logout',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axios.post('http://localhost:5000/api/auth/logout', {}, {
                 withCredentials: true
             });
             return response.data;
@@ -90,6 +104,11 @@ const authSlice = createSlice({
             state.user = action.payload.success ? action.payload.user : null;
             state.isAuthenticated = true;
         }).addCase(checkAuth.rejected, (state, action) => {
+            state.isLoading = false;
+            state.user = null;
+            state.isAuthenticated = false;
+        })
+        .addCase(logoutUser.fulfilled, (state, action) => {
             state.isLoading = false;
             state.user = null;
             state.isAuthenticated = false;

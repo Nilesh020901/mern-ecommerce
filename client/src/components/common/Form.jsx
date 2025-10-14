@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
-function CommonForm({ formFields, formData, setFormData, onSubmit, buttonText }) {
+function CommonForm({ formFields, formData, setFormData, onSubmit, buttonText, isBtnDisabled }) {
 
     function renderInputField(field) {
         let element = null;
@@ -78,7 +78,7 @@ function CommonForm({ formFields, formData, setFormData, onSubmit, buttonText })
                     </div>)
                 }
             </div>
-            <Button type="submit" className="mt-2 w-full">{buttonText || 'Submit'}</Button>
+            <Button disabled={isBtnDisabled} type="submit" className="mt-2 w-full">{buttonText || 'Submit'}</Button>
         </form>
     )
 }

@@ -23,7 +23,7 @@ const handleImageUpload = async (req, res) => {
 const addProduct = async (req, res) => {
 
     try {
-        const { title, description, price, category, brand, totalStock, image } = req.body;
+        const { title, description, price, category, brand, totalStock, image, salePrice } = req.body;
         if (!title || !description || !price || !category || !brand || !totalStock || !image) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
@@ -33,6 +33,7 @@ const addProduct = async (req, res) => {
             price,
             category,
             brand,
+            salePrice,
             totalStock,
             image
         })
@@ -63,35 +64,32 @@ const editProduct = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const { title, description, price, category, brand, totalStock, image } = req.body;
+        const { title, description, price, category, brand, totalStock, image, salePrice } = req.body;
 
         const product = await Product.findById(id);
         if (!product) {
             return res.status(404).json({ success: false, message: "Product not found" });
         }
         const updateData = {
-      title: title || product.title,
-      description: description || product.description,
-      category: category || product.category,
-      brand: brand || product.brand,
-      price: price === "" ? 0 : price || product.price,
-      salePrice: salePrice === "" ? 0 : salePrice || product.salePrice,
-      totalStock: totalStock || product.totalStock,
-      image: image || product.image,
-      averageReview: averageReview || product.averageReview,
-    };
+            title: title || product.title,
+            description: description || product.description,
+            category: category || product.category,
+            brand: brand || product.brand,
+            price: price === "" ? 0 : price || product.price,
+            salePrice: salePrice === "" ? 0 : salePrice || product.salePrice,
+            totalStock: totalStock || product.totalStock,
+            image: image || product.image,
+        };
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
-      new: true,
-    });
+        const updatedProduct = await Product.findByIdAndUpdate(id, updateData, { new: true, });
         res.status(200).json({ success: true, message: "Product updated successfully", data: updatedProduct });
     } catch (error) {
         console.error("Edit product error:", error);
         res.status(500).json({ success: false, message: "Server error during editing product" });
     }
 }
-//Delete a product
 
+//Delete a product
 const deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;
