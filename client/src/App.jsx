@@ -7,7 +7,7 @@ import AdminDasboard from "./pages/admin-view/dashboard"
 import AdminOrders from "./pages/admin-view/orders"
 import AdminProducts from "./pages/admin-view/products"
 import AdminFeatures from "./pages/admin-view/features"
-import ShoppingLayout from "./pages/shop-view/userlayout"
+import ShoppingLayout from "./components/shopping-view/userlayout"
 import NotFound from "./pages/not-found/index"
 import ShoppingHome from "./pages/shop-view/home"
 import ShoppingListing from "./pages/shop-view/listing"
@@ -20,7 +20,7 @@ import { useEffect } from "react"
 import { checkAuth } from "./store/auth-slice"
 import { Skeleton } from "@/components/ui/skeleton"
 
-
+//uYmbxmBX0QETsOYy
 function App() {
 
   const { user, isAuthenticated, isLoading } = useSelector(state => state.auth);
