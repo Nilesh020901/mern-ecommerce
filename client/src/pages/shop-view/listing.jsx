@@ -5,15 +5,31 @@ import { ArrowUpDownIcon } from "lucide-react";
 import { sortOptions } from "@/config";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllFilteredProducts } from "@/store/shop/product-slice.js";
+import { fetchAllFilteredProducts, fetchProductDetails } from "@/store/shop/product-slice.js";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
+import {  useSearchParams } from "react-router-dom";
+import ProductDetailDialog from "@/components/shopping-view/product-detail";
+
+function createSearchParamsHelper(filterParams) {
+    const queryParams = [];
+    for (const [key, value] of Object.entries(filterParams)) {
+        if (Array.isArray(value) && value.length > 0) {
+            const paramValue = value.join(',');
+            queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
+        }
+    }
+    console.log("call--params", queryParams)
+    return queryParams.join('&');
+}
 
 function  ShoppingListing() {
 
     const [filter, setFilter] = useState({});
     const [sortBy, setSortBy] = useState(null);
+    const [open, setOpen] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
     const dispatch = useDispatch();
-    const { productList } = useSelector((state) => state.shopProducts);
+    const { productList, productDetails } = useSelector((state) => state.shopProducts);
 
     function handleSortChange(value) {
         console.log("call-short", value)
@@ -21,11 +37,10 @@ function  ShoppingListing() {
     };
 
     function handleFilterChange(getSectionId, getCurrentOption) {
-        console.log("call-filter", getSectionId, getCurrentOption);
         let cpyFilters = { ...filter};
-        const indexOfCurrentOption = Object.keys(cpyFilters).indexOf(getSectionId);
+        const indexOfCurrentSection = Object.keys(cpyFilters).indexOf(getSectionId);
 
-        if (indexOfCurrentOption === -1) {
+        if (indexOfCurrentSection === -1) {
             cpyFilters = {
                 ...cpyFilters,
                 [getSectionId]: [getCurrentOption]
@@ -36,12 +51,18 @@ function  ShoppingListing() {
                 cpyFilters[getSectionId].push(getCurrentOption);
             } else {
                 cpyFilters[getSectionId].splice(indexOfCurrentOption, 1);
-                sessionStorage.setItem('filter', JSON.stringify(cpyFilters));
             }
+
         }
 
-        console.log("cpyFilters", cpyFilters);
         setFilter(cpyFilters);
+        sessionStorage.setItem('filter', JSON.stringify(cpyFilters));
+        console.log("cpyFilters", cpyFilters);
+        
+    }
+
+    function handleGetProductDetails(getCurrentProductId) {
+        dispatch(fetchProductDetails(getCurrentProductId));
     }
 
     useEffect(() => {
@@ -49,16 +70,26 @@ function  ShoppingListing() {
         setFilter(JSON.parse(sessionStorage.getItem('filter')) || {});
     }, []);
 
-    console.log("call-filter", filter, sortBy);
+    useEffect(() => {
+        if (filter && Object.keys(filter).length > 0) {
+            let createQueryString = createSearchParamsHelper(filter);
+            setSearchParams(new URLSearchParams(createQueryString));
+        }
+    }, [filter])
+
     //fetch list of products from backend
     useEffect(() => {
-        dispatch(fetchAllFilteredProducts());
-        
-    }, [dispatch]);
+        if (filter !== null && sortBy !== null) 
+        dispatch(fetchAllFilteredProducts({ filterParams: filter, sortParams: sortBy }));
+    }, [dispatch, sortBy, filter]);
 
-    console.log("call-uproducts", productList)
+    useEffect(() => {
+        if (productDetails !== null) setOpen(true);
+    }, [productDetails])
+
+    console.log("call-productDetails", productDetails);
     return (
-        <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6 p-4 md:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
             <ProductFilter filters={filter} handleFilterChange={handleFilterChange} />
             <div className="bg-background w-full rounded-lg shadow-sm">
                 <div className="p-4 border-b flex items-center justify-between">
@@ -85,11 +116,12 @@ function  ShoppingListing() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
                     {
                         productList && productList.length > 0 ? productList.map((product) => 
-                            <ShoppingProductTile product={product} />
+                            <ShoppingProductTile handleGetProductDetails={handleGetProductDetails} product={product} />
                         ) : (<p className="text-center text-muted-foreground col-span-full">No products found.</p>)
                     }
                 </div>
             </div>
+            <ProductDetailDialog open={open} setOpen={setOpen} productDetails={productDetails} />
         </div>
     )
 }
