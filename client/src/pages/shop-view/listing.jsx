@@ -9,6 +9,7 @@ import { fetchAllFilteredProducts, fetchProductDetails } from "@/store/shop/prod
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import {  useSearchParams } from "react-router-dom";
 import ProductDetailDialog from "@/components/shopping-view/product-detail";
+import { addToCart } from "@/store/shop/cart-slice";
 
 function createSearchParamsHelper(filterParams) {
     const queryParams = [];
@@ -28,6 +29,8 @@ function  ShoppingListing() {
     const [sortBy, setSortBy] = useState(null);
     const [open, setOpen] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
+    const { user } = useSelector(state => state.auth);
+    console.log("Current User:", user);
     const dispatch = useDispatch();
     const { productList, productDetails } = useSelector((state) => state.shopProducts);
 
@@ -65,6 +68,16 @@ function  ShoppingListing() {
         dispatch(fetchProductDetails(getCurrentProductId));
     }
 
+    function handleAddToCart(productId) {
+        if (!user || !user?.userId) {
+            console.warn("User not logged in. Cannot add to cart.");
+            return;
+        }
+        dispatch(addToCart({ userId: user?.userId, productId: productId, quantity: 1 })).then((res) => {
+            console.log("add-to-cart-res", res);
+        })
+    }
+
     useEffect(() => {
         setSortBy("price-lowtohigh");
         setFilter(JSON.parse(sessionStorage.getItem('filter')) || {});
@@ -87,7 +100,6 @@ function  ShoppingListing() {
         if (productDetails !== null) setOpen(true);
     }, [productDetails])
 
-    console.log("call-productDetails", productDetails);
     return (
         <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
             <ProductFilter filters={filter} handleFilterChange={handleFilterChange} />
@@ -116,7 +128,7 @@ function  ShoppingListing() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
                     {
                         productList && productList.length > 0 ? productList.map((product) => 
-                            <ShoppingProductTile handleGetProductDetails={handleGetProductDetails} product={product} />
+                            <ShoppingProductTile handleGetProductDetails={handleGetProductDetails} product={product} handleAddToCart={handleAddToCart} />
                         ) : (<p className="text-center text-muted-foreground col-span-full">No products found.</p>)
                     }
                 </div>

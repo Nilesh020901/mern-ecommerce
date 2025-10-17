@@ -1,5 +1,5 @@
-const Cart = require("../../models/shop/cart-model");
-const Product = require("../../models/shop/product-model");
+const Cart = require("../../models/Cart");
+const Product = require("../../models/Product");
 
 const addToCart = async (req, res) => {
     try {
@@ -19,7 +19,7 @@ const addToCart = async (req, res) => {
             cart = new Cart({ userId, items: [] });
         }
         // Check if product is already in cart
-        const existingItemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+        const existingItemIndex = cart.items.findIndex(item => item.product.toString() === productId);
         if (existingItemIndex !== -1) {
             // Product is already in cart, update quantity
             cart.items[existingItemIndex].quantity += quantity;
@@ -27,6 +27,7 @@ const addToCart = async (req, res) => {
             // Product is not in cart, add new item
             cart.items.push({ product: productId, quantity });
         }
+                console.log("Saving cart...");
         await cart.save();
         res.status(200).json({ status: "true", message: "Product added to cart", cart });
     } catch (error) {
@@ -104,11 +105,11 @@ const updateCartItems = async (req, res) => {
 
         const populateCartItems = validItems.map(item => ({
             product: item.productId ? item.productId._id : null,
-            image: item.image ? item.productId.image : null,
-            title: item.title ? item.productId.title : null,
-            price: item.price ? item.productId.price : null,
-            salePrice: item.salePrice ? item.productId.salePrice : null,
-            quantity: item.quantity ? item.quantity : null,
+            image: item.productId ? item.productId.image : null,
+            title: item.productId ? item.productId.title : null,
+            price: item.productId ? item.productId.price : null,
+            salePrice: item.productId ? item.productId.salePrice : null,
+            quantity: item.productId ? item.quantity : null,
         }));
 
         res.status(200).json({ status: "true", message: "Cart updated", cart: { ...cart._doc, items: populateCartItems } });

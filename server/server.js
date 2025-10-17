@@ -5,6 +5,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth/auth.routes');
 const adminProductRoutes = require('./routes/admin/product-routes');
 const shopProductRoutes = require('./routes/shop/products-routes');
+const shopCartRoutes = require('./routes/shop/cart-routes'); 
 require('dotenv').config();
 
 mongoose.connect(process.env.MONGO_URL)
@@ -33,5 +34,6 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/admin/products', adminProductRoutes);
 app.use('/api/shop/products', shopProductRoutes);
+app.use('/api/shop/cart', shopCartRoutes);
 
 app.listen(PORT, () => console.log(`server running ${PORT}`))
