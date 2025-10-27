@@ -10,6 +10,7 @@ import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import {  useSearchParams } from "react-router-dom";
 import ProductDetailDialog from "@/components/shopping-view/product-detail";
 import { addToCart } from "@/store/shop/cart-slice";
+import { useToast } from "@/hooks/use-toast";
 
 function createSearchParamsHelper(filterParams) {
     const queryParams = [];
@@ -30,7 +31,8 @@ function  ShoppingListing() {
     const [open, setOpen] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
     const { user } = useSelector(state => state.auth);
-    console.log("Current User:", user);
+    const {toast} = useToast();
+   
     const dispatch = useDispatch();
     const { productList, productDetails } = useSelector((state) => state.shopProducts);
 
@@ -73,9 +75,15 @@ function  ShoppingListing() {
             console.warn("User not logged in. Cannot add to cart.");
             return;
         }
-        dispatch(addToCart({ userId: user?.userId, productId: productId, quantity: 1 })).then((res) => {
-            console.log("add-to-cart-res", res);
-        })
+        dispatch(addToCart({ userId: user?.userId, productId: productId, quantity: 1 }))
+        .then((data) => {
+            if (data?.payload?.success) {
+                dispatch(fetchCartItems({ userId: user?.userId }));
+                toast({
+                    title: 'Product added to cart successfully!',
+                })
+            }
+        });
     }
 
     useEffect(() => {
@@ -98,7 +106,7 @@ function  ShoppingListing() {
 
     useEffect(() => {
         if (productDetails !== null) setOpen(true);
-    }, [productDetails])
+    }, [productDetails]);
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
