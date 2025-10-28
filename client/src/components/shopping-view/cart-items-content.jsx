@@ -1,29 +1,73 @@
 import { Minus, Plus, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteFromCart } from "@/store/shop/cart-slice";
+import { deleteFromCart, updateCartItems } from "@/store/shop/cart-slice";
+import { useToast } from "@/hooks/use-toast";
 
 
 
 function UserCartItemsContent({ cartItem }) {
+    console.log("cartItem in CartItemsContent:", cartItem);
     const { user } = useSelector((state) => state.auth);
+    const { toast } = useToast();
     const dispatch = useDispatch();
 
     function handleCartItemDelete(getCartItem) {
-        dispatch(deleteFromCart({ userId: user?.userId, productId: getCartItem?.product }) );    }
-    return <div className="flex items-center space-x-4">
+        try {
+            dispatch(
+                deleteFromCart({
+                    userId: user?.userId,
+                    productId: getCartItem.product || getCartItem.productId,
+                })
+            );
+            toast({
+                title: "Cart item Deleted Successfully",
+            });
+        } catch (error) {
+            toast({
+                title: "Error Deleting Cart item",
+            });
+        }
+    }
+
+    function handleUpdateQuantity(getCartItem, action) {
+        let newQuantity = getCartItem.quantity;
+        if (action === "plus") {
+            newQuantity++;
+        } else if (action === "minus" && newQuantity > 1) {
+            newQuantity--;
+        }
+        try {
+            const result = dispatch(
+                updateCartItems({
+                    userId: user?.userId,
+                    productId: getCartItem.product || getCartItem.productId,
+                    quantity: newQuantity,
+                })
+            ).unwrap();
+            toast({
+                title: "Cart item Updated Successfully",
+            });
+        } catch (error) {
+            toast({
+                title: "Error Updating Cart",
+            });
+        }
+    }
+
+    return <div className="flex items-center gap-4">
         <img src={cartItem?.image} alt={cartItem?.title} className="w-20 h-20 rounded-lg object-cover" />
         <div className="flex-1">
             <h3 className="font-semibold">{cartItem?.title}</h3>
             <div className="flex items-center gap-2 mt-1">
-                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full">
+                <Button disabled={cartItem?.quantity === 1} onClick={() => handleUpdateQuantity(cartItem, "minus")} variant="outline" size="icon" className="h-8 w-8 rounded-full">
                     <Minus className="w-4 h-4" />
                     <span className="sr-only">Decrease quantity</span>
                 </Button>
                 <span className="mx-3">{cartItem?.quantity}</span>
-                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full">
+                <Button onClick={() => handleUpdateQuantity(cartItem, "plus")} variant="outline" size="icon" className="h-8 w-8 rounded-full">
                     <Plus className="w-4 h-4" />
-                    <span className="sr-only">Decrease quantity</span>
+                    <span className="sr-only">Increase quantity</span>
                 </Button>
             </div>
         </div>

@@ -80,19 +80,11 @@ const updateCartItems = async (req, res) => {
         if (!cart) {
             return res.status(200).json({ status: "false", message: "Cart is empty",});
         }
-        const existingItemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
-        if (existingItemIndex === -1) {
-            return res.status(404).json({ status: "false", message: "Product not in cart" });
-        }
         const findCurrentProductIndex = cart.items.findIndex(
             (item) => item.productId.toString() === productId
         );
-
         if (findCurrentProductIndex === -1) {
-            return res.status(404).json({
-                success: false,
-                message: "Cart item not present !",
-            });
+            return res.status(404).json({ status: "false", message: "Product not in cart" });
         }
         cart.items[findCurrentProductIndex].quantity = quantity;
         await cart.save();
@@ -102,16 +94,16 @@ const updateCartItems = async (req, res) => {
             select: 'title price salePrice image'
         });
 
-        const populateCartItems = validItems.map(item => ({
+        const populateCartItems = cart.items.map(item => ({
             product: item.productId ? item.productId._id : null,
             image: item.productId ? item.productId.image : null,
-            title: item.productId ? item.productId.title : null,
+            title: item.productId ? item.productId.title : "Product not found",
             price: item.productId ? item.productId.price : null,
             salePrice: item.productId ? item.productId.salePrice : null,
             quantity: item.productId ? item.quantity : null,
         }));
 
-        res.status(200).json({ status: "true", message: "Cart updated", cart: { ...cart._doc, items: populateCartItems } });
+        res.status(200).json({ status: "true", message: "Cart updated", data: { ...cart._doc, items: populateCartItems } });
     } catch (error) {
         console.error("Error updating cart:", error);
         res.status(500).json({ status: "false", message: "Internal server error" });
@@ -131,7 +123,7 @@ const deleteCartItems = async (req, res) => {
         if (!cart) {
             return res.status(200).json({ status: "false", message: "Cart is empty",});
         }
-        cart.items = cart.items.filter(item => item.productId._id.toString() !== productId);
+        cart.items = cart.items.filter((item) => item.productId._id.toString() !== productId);
         await cart.save();
         await cart.populate({
             path: 'items.productId',
@@ -139,15 +131,15 @@ const deleteCartItems = async (req, res) => {
         });
 
         const populateCartItems = cart.items.map(item => ({
-            product: item.productId ? item.productId._id : null,
+            productId: item.productId ? item.productId._id : null,
             image: item.productId ? item.productId.image : null,
-            title: item.productId ? item.productId.title : null,
+            title: item.productId ? item.productId.title : "Product not found",
             price: item.productId ? item.productId.price : null,
             salePrice: item.productId ? item.productId.salePrice : null,
-            quantity: item.quantity ? item.quantity : null,
+            quantity: item.quantity,
         }));
 
-        res.status(200).json({ status: "true", message: "Cart deleted", cart: { ...cart._doc, items: populateCartItems } });
+        res.status(200).json({ status: "true", message: "Cart item deleted", data: { ...cart._doc, items: populateCartItems } });
     } catch (error) {
         console.error("Error adding to cart:", error);
         res.status(500).json({ status: "false", message: "Internal server error" });

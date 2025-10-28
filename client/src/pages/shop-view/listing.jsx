@@ -141,6 +141,7 @@ function  ShoppingListing() {
                     }
                 </div>
             </div>
+            {/* need to complete */}
             <ProductDetailDialog open={open} setOpen={setOpen} productDetails={productDetails} />
         </div>
     )
