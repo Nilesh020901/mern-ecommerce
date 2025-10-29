@@ -91,7 +91,6 @@ const shoppingCartSlice = createSlice({
             }).addCase(deleteFromCart.pending, (state) => {
                 state.isLoading = true;
             }).addCase(deleteFromCart.fulfilled, (state, action) => {
-                console.log("deleteFromCart called with:", action.payload);
                 state.isLoading = false;
                 state.cartItems = action.payload.data;
             }).addCase(deleteFromCart.rejected, (state) => {

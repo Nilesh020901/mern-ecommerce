@@ -11,11 +11,25 @@ import { Link, useNavigate } from "react-router-dom"
 import UserCartWrapper from "./cart-wrap"
 import { useEffect, useState } from "react"
 import { fetchCartItems } from "@/store/shop/cart-slice"
+import { Label } from "../ui/label"
 
 function MenuItems() {
+
+    const navigate = useNavigate();
+
+    function handleNavigate(getCurrentMenuItem) {
+        sessionStorage.removeItem('filter');
+        const currentFilter = getCurrentMenuItem.id !== 'home' ? 
+        {
+            category : [getCurrentMenuItem.id]
+        } : null
+
+        sessionStorage.setItem('filter', JSON.stringify(currentFilter))
+        navigate(getCurrentMenuItem.path)
+    }
     return <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
         {
-            shoppingViewHeaderMenuItems.map((menuItems) => <Link className="text-normal font-medium" key={menuItems.id} to={menuItems.path}>{menuItems.label}</Link>)
+            shoppingViewHeaderMenuItems.map((menuItems) => <Label onClick={() => handleNavigate(menuItems)} className="text-normal font-medium cursor-pointer" key={menuItems.id}>{menuItems.label}</Label>)
         }
     </nav>
 }
