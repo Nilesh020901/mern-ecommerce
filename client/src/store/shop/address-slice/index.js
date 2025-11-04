@@ -22,15 +22,15 @@ export const addNewAddress = createAsyncThunk(
 export const fetchAllAddress = createAsyncThunk(
     '/addresses/fetchAllAddress',
     async ({ userId }) => {
-        const response = await axios.post(`http://localhost:5000/api/shop/address/get-address/${userId}`)
+        const response = await axios.get(`http://localhost:5000/api/shop/address/get-address/${userId}`)
         return response.data
     }
 )
 
 export const editaAddress = createAsyncThunk(
     '/addresses/editaAddress',
-    async ({ userId, addressId, formData }) => {
-        const response = await axios.put(`http://localhost:5000/api/shop/address/${userId}/${addressId}`, formData)
+    async ({ formData, userId, addressId,  }) => {
+        const response = await axios.put(`http://localhost:5000/api/shop/address/edit-address/${userId}/${addressId}`, formData)
         return response.data
     }
 )
