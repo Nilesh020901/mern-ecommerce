@@ -20,7 +20,6 @@ function createSearchParamsHelper(filterParams) {
             queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
         }
     }
-    console.log("call--params", queryParams)
     return queryParams.join('&');
 }
 
@@ -37,7 +36,6 @@ function  ShoppingListing() {
     const { productList, productDetails } = useSelector((state) => state.shopProducts);
 
     function handleSortChange(value) {
-        console.log("call-short", value)
         setSortBy(value);
     };
 

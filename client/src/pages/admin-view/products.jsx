@@ -38,7 +38,6 @@ function AdminProducts() {
         dispatch(editProduct({
             id: currentEditedId, formData
         })).then((data) => {
-            console.log("call-edit", data);
             if (data?.payload?.success) {
                 dispatch(fetchAllProducts());
                 setImageFile(null);

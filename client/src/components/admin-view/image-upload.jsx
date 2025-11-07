@@ -13,7 +13,6 @@ function ProductImageUpload({ imageFile, setImageFile, uploadedImageUrl, setUplo
     const handleImageFileChange = (e) => {
         console.log(e.target.files);
         const selectedFile = e.target.files?.[0];
-        console.log("call-selectedFile", selectedFile);
         if (selectedFile) {
             setImageFile(selectedFile);
         }

@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 
 
 function UserCartItemsContent({ cartItem }) {
-    console.log("cartItem in CartItemsContent:", cartItem);
     const { user } = useSelector((state) => state.auth);
     const { toast } = useToast();
     const dispatch = useDispatch();

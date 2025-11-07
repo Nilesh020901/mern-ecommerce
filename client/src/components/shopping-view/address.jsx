@@ -14,7 +14,7 @@ const initialAddressFormData = {
     pincode: '',
     notes: ''
 }
-function Address() {
+function Address({ currentSelectedAddress, setCurrentSelectedAddress }) {
 
     const [formData, setFormData] = useState(initialAddressFormData);
     const [currentEditedId, setCurrentEditedId] = useState(null);
@@ -84,10 +84,6 @@ function Address() {
             pincode: getCurrentAddress?.pincode ?? '',
             notes: getCurrentAddress?.notes ?? ''
         })
-        // dispatch(editaAddress({ ...formData, userId: user?.userId, addressId:getCurrentAddress._id }))
-        //     .then((data) => {
-        //         console.log("call-edit", data)
-        //     })
     }
 
     function isFormValid() {
@@ -100,7 +96,6 @@ function Address() {
         }
     }, [dispatch, user?.userId]);
 
-    console.log("call-addressList", addressList);
     return (
         <Card>
             <div className="mb-5 p-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -111,6 +106,7 @@ function Address() {
                                 handleDeleteAddress={handleDeleteAddress} 
                                 addressInfo={singleAddressItems}
                                 handleEditAddress={handleEditAddress}
+                                setCurrentSelectedAddress={setCurrentSelectedAddress}
                             />
                         ))
                     ) : (null)
