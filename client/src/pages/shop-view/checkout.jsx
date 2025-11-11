@@ -5,6 +5,7 @@ import UserCartItemsContent from '@/components/shopping-view/cart-items-content'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { createNewOrder } from '@/store/shop/order-slice'
+import { useToast } from '@/hooks/use-toast'
 
 
 function  ShoppingCheckout() {
@@ -12,6 +13,7 @@ function  ShoppingCheckout() {
     const { cartItems } = useSelector(state=> state.shopCart);
     const { user } = useSelector((state) => state.auth);
     const { approvalURL } = useSelector((state)=> state.shopOrder)
+    const { toast } = useToast();
     const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
     const [isPaymentStart, setIsPaymentStart] = useState(false)
     const dispatch = useDispatch();
@@ -24,6 +26,24 @@ function  ShoppingCheckout() {
     ): 0;
     
     function handleInitiatePaypalPayment() {
+
+        if (cartItems.length === 0) {
+            toast({
+                title: 'Please select one product to proceed.',
+                variant: 'destructive'
+            })
+
+            return
+        }
+
+        if (currentSelectedAddress === null) {
+            toast({
+                title: 'Please select one address to proceed.',
+                variant: 'destructive'
+            })
+
+            return
+        }
         const orderData = {
             userId: user?.userId,
             cartId: cartItems?._id,
@@ -46,12 +66,13 @@ function  ShoppingCheckout() {
             paymentMethod: 'paypal',
             paymentStatus: 'pending',
             totalAmount: totalCartAmount,
-            orderData: new Date(),
+            orderDate: new Date(),
             orderUpdateDate: new Date(),
             paymentId: '',
             payerId: ''
         };
         
+        console.log("call-orderData", orderData);
         dispatch(createNewOrder(orderData)).then((data)=> {
             console.log("call-data", data)
             if (data?.payload?.success) {
@@ -88,7 +109,11 @@ function  ShoppingCheckout() {
                         </div>
                     </div>
                     <div className='mt-4'>
-                        <Button onClick={handleInitiatePaypalPayment} className="w-full">Checkout with Paypal</Button>
+                        <Button onClick={handleInitiatePaypalPayment} className="w-full">
+                            {isPaymentStart
+                                ? "Processing Paypal Payment..."
+                                : "Checkout with Paypal"}
+                        </Button>
                     </div>
                 </div>
             </div>

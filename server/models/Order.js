@@ -12,7 +12,7 @@ const OrderSchema = new mongoose.Schema({
             quantity: Number,
         }
     ],
-    address: {
+    addressInfo: {
         addressId: String,
         address: String,
         city: String,
