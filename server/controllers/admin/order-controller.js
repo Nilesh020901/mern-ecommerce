@@ -42,9 +42,36 @@ const getOrderDetailsForAdmin = async (req, res) => {
         console.error("Error to get orders detail:", error);
         res.status(500).json({ status: "false", message: "Internal server error" });
     }
+};
+
+const updateOrderStatus = async(req, res) => {
+    try {
+        const {id} = req.params;
+        const {orderStatus} = req.body
+
+        const order = await Order.findById(id);
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found!'
+            })
+        }
+
+        await Order.findByIdAndUpdate(id, {orderStatus})
+
+        res.status(201).json({
+            success: true,
+            message: 'Order status is updated successfully'
+        })
+    } catch (error) {
+        console.error("Error to updating order status:", error);
+        res.status(500).json({ status: "false", message: "Internal server error" });
+    }
 }
 
 module.exports = {
     getAllOrdersAllUsers,
-    getOrderDetailsForAdmin
+    getOrderDetailsForAdmin,
+    updateOrderStatus
 }

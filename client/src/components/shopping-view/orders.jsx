@@ -56,7 +56,13 @@ function ShoppingOrders() {
                                         <TableCell>{orderItem?._id}</TableCell>
                                         <TableCell>{orderItem?.orderDate && new Date(orderItem.orderDate).toLocaleDateString()}</TableCell>
                                         <TableCell>
-                                            <Badge className={`py-1 px-3 ${orderItem?.orderStatus === 'confirmed' ? 'bg-green-500' : 'bg-black'}`}>{orderItem?.orderStatus}</Badge>
+                                            <Badge className={`py-1 px-3 ${orderItem?.orderStatus === 'confirmed'
+                                                    ? 'bg-green-500'
+                                                    : orderItem?.orderStatus === 'rejected'
+                                                        ? 'bg-red-500'
+                                                        : 'bg-black'}`}>
+                                                {orderItem?.orderStatus}
+                                            </Badge>
                                         </TableCell>
                                         <TableCell>${orderItem?.totalAmount}</TableCell>
                                         <TableCell>

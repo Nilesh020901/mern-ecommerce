@@ -1,4 +1,3 @@
-import { resetOrderDetails } from "@/store/shop/order-slice";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -37,6 +36,25 @@ export const getOrderDetaisForAdmin = createAsyncThunk(
     }
 );
 
+export const updateOrderStatus = createAsyncThunk(
+    '/order/updateOrderStatus',
+    async ({id, orderStatus}, { rejectWithValue }) => {
+        try {
+            const response = await axios.put(
+                `http://localhost:5000/api/admin/orders/update/${id}`,
+                {
+                    orderStatus
+                }
+            );
+            return response.data;
+        } catch (error) {
+            // handle and return error in Redux Toolkit style
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+
 const adminOrderSlice = createSlice({
     name: 'adminOrderSlice',
     initialState,
@@ -66,5 +84,5 @@ const adminOrderSlice = createSlice({
     },
 });
 
-export const { resetOrderDetails } = adminOrderSlice.reducer;
+export const { resetOrderDetails } = adminOrderSlice.actions;
 export default adminOrderSlice.reducer;

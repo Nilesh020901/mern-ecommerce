@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import AdminOrderDetailsView from "./order-details";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllOrdersForAdmin, getOrderDetaisForAdmin, resetOrderDetails } from "@/store/admin/order-slice";
+import { Badge } from "../ui/badge";
 
 function AdminOrdersView() {
     
@@ -53,7 +54,11 @@ function AdminOrdersView() {
                                         <TableCell>{orderItem?._id}</TableCell>
                                         <TableCell>{orderItem?.orderDate && new Date(orderItem.orderDate).toLocaleDateString()}</TableCell>
                                         <TableCell>
-                                            <Badge className={`py-1 px-3 ${orderItem?.orderStatus === 'confirmed' ? 'bg-green-500' : 'bg-black'}`}>{orderItem?.orderStatus}</Badge>
+                                            <Badge className={`py-1 px-3 ${orderDetails?.orderStatus === 'confirmed'
+                                                    ? 'bg-green-500'
+                                                    : orderDetails?.orderStatus === 'rejected'
+                                                    ? 'bg-red-500'
+                                                    : 'bg-black'}`}>{orderDetails?.orderStatus}</Badge>
                                         </TableCell>
                                         <TableCell>${orderItem?.totalAmount}</TableCell>
                                         <TableCell>

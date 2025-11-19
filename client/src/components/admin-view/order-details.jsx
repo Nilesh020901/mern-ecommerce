@@ -4,17 +4,35 @@ import { DialogContent } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
-import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { getAllOrdersForAdmin, getOrderDetaisForAdmin, updateOrderStatus } from "@/store/admin/order-slice";
+import { useToast } from "@/hooks/use-toast";
 
 const initialFormData = {
     status: ''
 }
 function AdminOrderDetailsView({ orderDetails }) {
     const {user} = useSelector((state) => state.auth);
+    const {toast} = useToast()
     const [formData, setFormData] = useState(initialFormData);
+    const dispatch = useDispatch
 
     function handleUpdateStatus(e) {
         e.preventDefault();
+        console.log("call-formData", formData);
+        const {status} = formData;
+
+        dispatch(updateOrderStatus({ id: orderDetails?._id, orderStatus: status })).then((data) => {
+            console.log("call-data", data);
+            if (data?.payload?.success) {
+                dispatch(getOrderDetaisForAdmin(orderDetails?._id));
+                dispatch(getAllOrdersForAdmin())
+                setFormData(initialFormData)
+                toast({
+                    title: data?.payload?.message
+                })
+            }
+        })
     }
 
     return (
@@ -44,7 +62,12 @@ function AdminOrderDetailsView({ orderDetails }) {
                     <div className="flex mt-2 items-center justify-between">
                         <p className="font-medium">Order Status</p>
                         <Label>
-                            <Badge className={`py-1 px-3 ${orderDetails?.orderStatus === 'confirmed' ? 'bg-green-500' : 'bg-black'}`}>{orderDetails?.orderStatus}</Badge>
+                            <Badge className={`py-1 px-3 ${
+                                orderDetails?.orderStatus === 'confirmed' 
+                                ? 'bg-green-500' 
+                                : orderDetails?.orderStatus === 'rejected' 
+                                ? 'bg-red-500'
+                                : 'bg-black'}`}>{orderDetails?.orderStatus}</Badge>
                         </Label>
                     </div>
                 </div>
