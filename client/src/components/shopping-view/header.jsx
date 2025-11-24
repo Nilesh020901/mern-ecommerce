@@ -14,26 +14,31 @@ import { fetchCartItems } from "@/store/shop/cart-slice"
 import { Label } from "../ui/label"
 
 function MenuItems() {
-
     const navigate = useNavigate();
 
-    function handleNavigate(getCurrentMenuItem) {
-        sessionStorage.removeItem('filter');
-        const currentFilter = getCurrentMenuItem.id !== 'home' ? 
-        {
-            category : [getCurrentMenuItem.id]
-        } : null
-
-        sessionStorage.setItem('filter', JSON.stringify(currentFilter))
-        navigate(getCurrentMenuItem.path)
-    }
-    return <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
-        {
-            shoppingViewHeaderMenuItems.map((menuItems) => <Label onClick={() => handleNavigate(menuItems)} className="text-normal font-medium cursor-pointer" key={menuItems.id}>{menuItems.label}</Label>)
+    function handleNavigate(item) {
+        if (item.id === "home" || item.id === "products") {
+            navigate(item.path);
+        } else {
+            navigate(`${item.path}?category=${item.id}`);
         }
-    </nav>
+    }
+
+    return (
+        <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
+            {shoppingViewHeaderMenuItems.map((menuItems) => (
+                <Label
+                    onClick={() => handleNavigate(menuItems)}
+                    className="text-normal font-medium cursor-pointer"
+                    key={menuItems.id}
+                >
+                    {menuItems.label}
+                </Label>
+            ))}
+        </nav>
+    );
 }
- 
+
 function HeaderRightContent() {
 
     const [openCartSheet, setOpenCartSheet] = useState(false);
@@ -50,7 +55,7 @@ function HeaderRightContent() {
             title: 'Please Visit Again!',
         })
     }
-    
+
     useEffect(() => {
         dispatch(fetchCartItems({ userId: user?.userId }));
     }, [dispatch]);
